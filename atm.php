@@ -85,40 +85,46 @@ class ATM {
     // 標準入力のメソッドを作成しました。
     public function input($type) {
 
-        $check = new checkValidation();
+        $checkValidation = new checkValidation();
         $msg = "";
 
         switch($type) {
             case "select":
                 $input = intval(trim(fgets(STDIN)));
-                $msg = $check->checkSelect($input);
+                $check = $checkValidation->checkSelect($input);
                 break;
             case "deposit":
                 $input = intval(trim(fgets(STDIN)));
-                $msg = $check->checkDeposite($input);
+                $check = $checkValidation->checkDeposite($input);
                 break;
             case "withdraw":
                 $input = intval(trim(fgets(STDIN)));
                 // ユーザー情報を引数で渡し値のチェックを行うように変えました
-                $msg = $check->checkWithdraw($input, $this->user["balance"]);
+                $check = $checkValidation->checkWithdraw($input, $this->user["balance"]);
                 break;
             case "id":
                 $input = intval(trim(fgets(STDIN)));
-                $msg = $check->checkInputId($input);
+                $check = $checkValidation->checkInputId($input);
                 $input = strval($input);
                 break;
             case "password":
                 $input = intval(trim(fgets(STDIN)));
-                $msg = $check->checkInputPassword($input);
+                $check = $checkValidation->checkInputPassword($input);
                 $input = strval($input);
             break;
             case "continue":
                 $input = trim(fgets(STDIN));
-                $msg = $check->checkContinue($input);
+                $check = $checkValidation->checkContinue($input);
             break;
         }
         // エラー文をATMメソッドで出力するにあたってエラーメッセージがあるかどうかで真偽を確認する方法に変えました。
-        if($msg !== "") {
+        // if($msg !== "") {
+        //     echo $msg . PHP_EOL;
+        //     return $this->input($type);
+        // }
+        // $checkにて[true,false]の判定をしfalseであれば$msgにエラーメッセージを格納、出力を行う用に変えました
+        if($check === false) {
+            $msg = $checkValidation->getErrorMessage($type, $input, $this->user["balance"]);
             echo $msg . PHP_EOL;
             return $this->input($type);
         }
