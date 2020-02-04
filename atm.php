@@ -1,6 +1,13 @@
 <?php
 
-require('./validation/testvali.php');
+require_once('./validation/selectValidation.php');
+require_once('./validation/depositValidation.php');
+require_once('./validation/withdrawValidation.php');
+require_once('./validation/inputIdValidation.php');
+require_once('./validation/inputPasswordValidation.php');
+require_once('./validation/continueValidation.php');
+require_once('./validation/errorMessage.php');
+require_once('./validation/userValidation.php');
 
 class ATM {
     // user変数の宣言 staticを外しました
@@ -32,12 +39,13 @@ class ATM {
     public function login() {
         // Userクラスのインスタンス化
         $checkUserList = new User();
+        $userValidation = new userValidation();
 
         //id入力
         echo "お客様のIDをご入力ください。" . PHP_EOL;
         $inputId = $this->input(self::INPUT_TYPE_LOGINID);
         //Userクラスのユーザーリストにidがあるかチェック
-        $check = $checkUserList->checkUserId($inputId);
+        $check = $userValidation->checkUserId($inputId);
             //なければエラー、再帰関数
         if(!$check) {
             return $this->login();
@@ -53,7 +61,7 @@ class ATM {
         $password = $this->input(self::INPUT_TYPE_PASSWORD);
 
         //取得したユーザーのパスワードと入力値が一致するかチェック
-        $check = $checkUserList->checkPassword($inputId, $password);
+        $check = $userValidation->checkPassword($inputId, $password);
 
             //なければエラー、再帰関数
         if(!$check) {
@@ -85,36 +93,49 @@ class ATM {
     // 標準入力のメソッドを作成しました。
     public function input($type) {
 
-        $checkValidation = new checkValidation();
+        // 全てのインスタンスを作成するのではなく$typeの値によってクラスを生成するよう変更しました。
+        // $selectValidation = new selectValidation();
+        // $depositValidation = new depositValidation();
+        // $withdrawValidation = new withdrawValidation();
+        // $inputIdValidation = new inputIdValidation();
+        // $inputPasswordValidation = new inputPasswordValidation();
+        // $continueValidation = new continueValidation();
+        $errorMessage = new errorMessage();
         $msg = "";
 
         switch($type) {
             case "select":
                 $input = intval(trim(fgets(STDIN)));
-                $check = $checkValidation->checkSelect($input);
+                $validation = new selectValidation();
+                $check = $validation->checkSelect($input);
                 break;
             case "deposit":
                 $input = intval(trim(fgets(STDIN)));
-                $check = $checkValidation->checkDeposite($input);
+                $validation = new depositValidation();
+                $check = $validation->checkDeposite($input);
                 break;
             case "withdraw":
                 $input = intval(trim(fgets(STDIN)));
-                // ユーザー情報を引数で渡し値のチェックを行うように変えました
-                $check = $checkValidation->checkWithdraw($input, $this->user["balance"]);
+                // ユーザー情報を引数で渡し値のチェックを行うように変えました]
+                $validation = new withdrawValidation();
+                $check = $validation->checkWithdraw($input, $this->user["balance"]);
                 break;
             case "id":
                 $input = intval(trim(fgets(STDIN)));
-                $check = $checkValidation->checkInputId($input);
+                $validation = new inputIdValidation();
+                $check = $validation->checkInputId($input);
                 $input = strval($input);
                 break;
             case "password":
                 $input = intval(trim(fgets(STDIN)));
-                $check = $checkValidation->checkInputPassword($input);
+                $validation = new inputPasswordValidation();
+                $check = $validation->checkInputPassword($input);
                 $input = strval($input);
             break;
             case "continue":
                 $input = trim(fgets(STDIN));
-                $check = $checkValidation->checkContinue($input);
+                $validation = new continueValidation();
+                $check = $validation->checkContinue($input);
             break;
         }
         // エラー文をATMメソッドで出力するにあたってエラーメッセージがあるかどうかで真偽を確認する方法に変えました。
@@ -124,7 +145,7 @@ class ATM {
         // }
         // $checkにて[true,false]の判定をしfalseであれば$msgにエラーメッセージを格納、出力を行う用に変えました
         if($check === false) {
-            $msg = $checkValidation->getErrorMessage($type, $input, $this->user["balance"]);
+            $msg = $errorMessage->getErrorMessage($type, $input, $this->user["balance"]);
             echo $msg . PHP_EOL;
             return $this->input($type);
         }
@@ -231,29 +252,30 @@ class User {
         )
     );
 
-    // ATMメソッドで入力されたIDが$user_listにあるかを確認する
-    public function checkUserId($inputId) {
-        for($i = 1; $i <= count(self::$user_list); $i++) {
-            if($inputId === self::$user_list[$i]["id"]) {
-                return true;
-            }
-        }
-        echo "登録されていないIDです。" . PHP_EOL;
-        return false;
-    }
-
-    public function checkPassword($inputId, $password) {
-        if($password === self::$user_list[$inputId]["password"]) {
-            return true;
-        } else {
-            echo "パスワードが誤っています。もう一度やり直してください。" . PHP_EOL;
-            return false;
-        }
-    }
-
     public function findById($inputId) {
         return self::$user_list[$inputId];
     }
+
+    // // ATMメソッドで入力されたIDが$user_listにあるかを確認する
+    // public function checkUserId($inputId) {
+    //     for($i = 1; $i <= count(self::$user_list); $i++) {
+    //         if($inputId === self::$user_list[$i]["id"]) {
+    //             return true;
+    //         }
+    //     }
+    //     echo "登録されていないIDです。" . PHP_EOL;
+    //     return false;
+    // }
+
+    // public function checkPassword($inputId, $password) {
+    //     if($password === self::$user_list[$inputId]["password"]) {
+    //         return true;
+    //     } else {
+    //         echo "パスワードが誤っています。もう一度やり直してください。" . PHP_EOL;
+    //         return false;
+    //     }
+    // }
+
 }
 
 $atm = new ATM();
