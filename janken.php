@@ -88,7 +88,7 @@ function replayJanken() { // 再度ジャンケンするかどうか決める関
     }
 }
 
-echo "最初は" . HAND_TYPE[1] . "！ ジャンケン・・・" . PHP_EOL; //　グーを定数を用いて表現しなおしました。
+echo "最初は" . HAND_TYPE[1] . "！ ジャンケン・・・" . PHP_EOL; // グーを定数を用いて表現しなおしました。
 
 playJanken();
 
