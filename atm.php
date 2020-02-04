@@ -6,7 +6,8 @@ require_once('./validation/withdrawValidation.php');
 require_once('./validation/inputIdValidation.php');
 require_once('./validation/inputPasswordValidation.php');
 require_once('./validation/continueValidation.php');
-require_once('./validation/errorMessage.php');
+// errorMessageメソッドを各バリデーションファイルに格納しました
+// require_once('./validation/errorMessage.php');
 require_once('./validation/userValidation.php');
 
 class ATM {
@@ -100,7 +101,7 @@ class ATM {
         // $inputIdValidation = new inputIdValidation();
         // $inputPasswordValidation = new inputPasswordValidation();
         // $continueValidation = new continueValidation();
-        $errorMessage = new errorMessage();
+        // $errorMessage = new errorMessage();
         $msg = "";
 
         switch($type) {
@@ -145,7 +146,9 @@ class ATM {
         // }
         // $checkにて[true,false]の判定をしfalseであれば$msgにエラーメッセージを格納、出力を行う用に変えました
         if($check === false) {
-            $msg = $errorMessage->getErrorMessage($type, $input, $this->user["balance"]);
+            // $msg = $errorMessage->getErrorMessage($type, $input, $this->user["balance"]);
+            // echo $msg . PHP_EOL;
+            $msg = $validation->getErrorMessage();
             echo $msg . PHP_EOL;
             return $this->input($type);
         }
